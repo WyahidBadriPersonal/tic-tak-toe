@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+type Board = (string | undefined)[][];
+
+
 const generateBoard = (size: number) => {
   const newBoard = [];
   for (let i = 0; i < size; i++) {
@@ -8,7 +11,7 @@ const generateBoard = (size: number) => {
   return newBoard;
 };
 
-const checkHorizontal = (board: any) => {
+const checkHorizontal = (board: Board) => {
     for(let row of board){
         const rowSet = new Set(row)
         if(rowSet.size == 1 && !rowSet.has(undefined)){
@@ -17,7 +20,7 @@ const checkHorizontal = (board: any) => {
     }
 }
 
-const rowsToColumns = (board: any) => {
+const rowsToColumns = (board: Board) => {
     const newBoard = []
     let column = 0
     while(column < board.length){
@@ -31,16 +34,33 @@ const rowsToColumns = (board: any) => {
     return newBoard
 }
 
-const checkWin = (board: any) => {
+const dialgonalToRow = (board: Board) => {
+    const newBoard: Board = [[],[]]
+    let increment = 0
+    let decrement = board.length - 1
+
+    while(increment < board.length){
+        newBoard[0].push(board[increment][increment])
+        newBoard[1].push(board[increment][decrement])
+        increment++
+        decrement--
+    }
+    return newBoard;
+}
+
+const checkWin = (board: Board) => {
   //Horizontal
   if(checkHorizontal(board)){
-    return true;
+    return true
   }
   //Vertical
   if(checkHorizontal(rowsToColumns(board))){
     return true
   }
   //Diagonal
+  if(checkHorizontal(dialgonalToRow(board))){
+    return true
+  }
 }
 const TicTacToe = () => {
   const [board, setBoard] = useState(generateBoard(3));
@@ -51,6 +71,8 @@ const TicTacToe = () => {
       setBoard([...board]);
       if(checkWin(board)){
           alert(`Player ${currentPlayer} wins!`);
+          setBoard(generateBoard(3))
+          setCurrentPlayer("X")
       }
       setCurrentPlayer(currentPlayer == "X" ? "O" : "X");
   }
